@@ -45,7 +45,7 @@ enable_wineandroid_drv=no
 --with-gettextpo=no
 --without-gphoto
 --with-gnutls
---without-gstreamer
+--with-gstreamer
 --without-inotify
 --with-krb5
 --with-mingw=clang
@@ -73,7 +73,7 @@ enable_wineandroid_drv=no
 --with-xrandr
 --with-xrender
 --without-xshape
---without-xshm
+--with-xshm
 --without-xxf86vm
 --enable-archs=i386,aarch64,arm64ec
 "
@@ -83,10 +83,10 @@ enable_wineandroid_drv=no
 _setup_llvm_mingw_toolchain() {
 	# LLVM-mingw's version number must not be the same as the NDK's.
 	local _llvm_mingw_version=19
-	local _version="20240929"
-	local _url="https://github.com/bylaws/llvm-mingw/releases/download/$_version/llvm-mingw-$_version-ucrt-ubuntu-20.04-x86_64.tar.xz"
+	local _version="20241218"
+	local _url="https://github.com/bylaws/llvm-mingw/releases/download/20241812/llvm-mingw-20241218-ucrt-ubuntu-20.04-x86_64.tar.xz"
 	local _path="$TERMUX_PKG_CACHEDIR/$(basename $_url)"
-	local _sha256sum=ce75ad076c87663fd4a77513e947252d97ce799a11926c1f3ac7afed1d6ab85c
+	local _sha256sum=710b7a96a06c99128427d31e3b7b1cac5b17a111219ae1c163e1f1f870c434b6
 	termux_download $_url $_path $_sha256sum
 	local _extract_path="$TERMUX_PKG_CACHEDIR/llvm-mingw-toolchain-$_llvm_mingw_version"
 	if [ ! -d "$_extract_path" ]; then
@@ -110,26 +110,22 @@ termux_step_pre_configure() {
 	# Setup llvm-mingw toolchain
 	_setup_llvm_mingw_toolchain
 
-	# Fix overoptimization
-	CPPFLAGS="${CPPFLAGS/-Oz/}"
-	CFLAGS="${CFLAGS/-Oz/}"
-	CXXFLAGS="${CXXFLAGS/-Oz/}"
+	# Enforce only -O2
+	CFLAGS="-O2"
+	CXXFLAGS="-O2"
+	CPPFLAGS="-O2"
+	LDFLAGS=""
 
-	# Disable hardening
-	CPPFLAGS="${CPPFLAGS/-fstack-protector-strong/}"
-	CFLAGS="${CFLAGS/-fstack-protector-strong/}"
-	CXXFLAGS="${CXXFLAGS/-fstack-protector-strong/}"
-	LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
-
+	# Ensure -landroid-spawn is included
 	LDFLAGS+=" -landroid-spawn"
 }
 
 termux_step_make() {
-	make -j $TERMUX_PKG_MAKE_PROCESSES
+	make -j8 $TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_make_install() {
-	make -j $TERMUX_PKG_MAKE_PROCESSES install
+	make -j8 $TERMUX_PKG_MAKE_PROCESSES install
 
 	# Create hangover-wine script
 	mkdir -p $TERMUX_PREFIX/bin
