@@ -1,0 +1,13 @@
+  GNU nano 8.3                        test.patch
+diff --git a/dlls/amd_ags_x64/unixlib.c b/dlls/amd_ags_x64/unixlib.c
+index 7e5bc5b..ef8733f 100644
+--- a/dlls/amd_ags_x64/unixlib.c
++++ b/dlls/amd_ags_x64/unixlib.c
+@@ -33,7 +33,6 @@
+
+ #include <xf86drm.h>
+ #include <amdgpu_drm.h>
+-#include <amdgpu.h>
+
+ #include "ntstatus.h"
+ #define WIN32_NO_STATUS
