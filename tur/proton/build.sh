@@ -120,11 +120,11 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	make -j8 $TERMUX_PKG_MAKE_PROCESSES
+	make -j $TERMUX_PKG_MAKE_PROCESSES
 }
 
 termux_step_make_install() {
-	make -j8 $TERMUX_PKG_MAKE_PROCESSES install
+	make -j $TERMUX_PKG_MAKE_PROCESSES install
 
 	# Create proton-wine script
 	mkdir -p $TERMUX_PREFIX/bin
