@@ -7,10 +7,10 @@ TERMUX_PKG_VERSION=9.0
 TERMUX_PKG_REVISION=1
 _REAL_VERSION="${TERMUX_PKG_VERSION/\~/-}"
 TERMUX_PKG_SRCURL=(
-	https://github.com/airidosas252/wine-test/releases/download/Proton-9.0/wine-proton-9.0-arm64ec.tar.xz
+	https://github.com/airidosas252/wine-test/releases/download/Proton-9.0-fix/wine-proton-9.0-arm64ec.tar.xz
 )
 TERMUX_PKG_SHA256=(
-	a674ce79c49c4917e0e915063e5eb5205036d1cc8d38138021c8a1967d720528
+	3af0eb1e78c6b1a01cb6508dd73777dfa110db574b30f7f69c437d2d8d13eafa
 )
 TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
