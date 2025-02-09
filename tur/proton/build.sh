@@ -95,6 +95,8 @@ termux_step_host_build() {
 	# Setup llvm-mingw toolchain
 	_setup_llvm_mingw_toolchain
 
+        find $TERMUX_PKG_SRCDIR -name "configure"
+
 	# Make host wine-tools
 	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
 	make -j "$TERMUX_PKG_MAKE_PROCESSES" __tooldeps__ nls/all
