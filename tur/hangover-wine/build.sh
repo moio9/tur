@@ -14,9 +14,9 @@ TERMUX_PKG_SHA256=(
 	f2b61e494d8c04b2f85eb4979fbdc15de651bed6e895c1c61d54b416f405d0ee
 	c7cb7db11fad036d849b80a8fd6bf2dbae0d3c6b7eefb1bf77b1b7a284a7c913
 )
-TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
+TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libandroid-shmem, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
-TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, vulkan-loader-generic"
+TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, libandroid-shmem-static, vulkan-loader-generic"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
@@ -121,7 +121,7 @@ termux_step_pre_configure() {
 	CXXFLAGS="${CXXFLAGS/-fstack-protector-strong/}"
 	LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
 
-	LDFLAGS+=" -landroid-spawn"
+	LDFLAGS+=" -landroid-spawn, -landroid-shmem"
 }
 termux_step_make() {
 	make -j $TERMUX_PKG_MAKE_PROCESSES
