@@ -110,16 +110,19 @@ termux_step_pre_configure() {
 	# Setup llvm-mingw toolchain
 	_setup_llvm_mingw_toolchain
 
-	# Enforce only -O2
-	CFLAGS="-O2"
-	CXXFLAGS="-O2"
-	CPPFLAGS="-O2"
-	LDFLAGS=""
+	# Fix overoptimization
+	CPPFLAGS="${CPPFLAGS/-Oz/}"
+	CFLAGS="${CFLAGS/-Oz/}"
+	CXXFLAGS="${CXXFLAGS/-Oz/}"
 
-	# Ensure -landroid-spawn is included
+	# Disable hardening
+	CPPFLAGS="${CPPFLAGS/-fstack-protector-strong/}"
+	CFLAGS="${CFLAGS/-fstack-protector-strong/}"
+	CXXFLAGS="${CXXFLAGS/-fstack-protector-strong/}"
+	LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
+
 	LDFLAGS+=" -landroid-spawn"
 }
-
 termux_step_make() {
 	make -j $TERMUX_PKG_MAKE_PROCESSES
 }
