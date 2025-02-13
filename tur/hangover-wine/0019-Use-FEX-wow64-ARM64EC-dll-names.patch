@@ -1,0 +1,64 @@
+From b215f3a91354ece5d1931e4f58f6d5f617ae20fe Mon Sep 17 00:00:00 2001
+From: Billy Laws <blaws05@gmail.com>
+Date: Wed, 17 Apr 2024 23:44:33 +0000
+Subject: [PATCH 10/14] Use FEX wow64/ARM64EC dll names
+
+---
+ dlls/ntdll/loader.c  | 3 +--
+ dlls/wow64/syscall.c | 2 +-
+ loader/wine.inf.in   | 4 ++--
+ 3 files changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/dlls/ntdll/loader.c b/dlls/ntdll/loader.c
+index 54df9f485c9..4027c4b7ff5 100644
+--- a/dlls/ntdll/loader.c
++++ b/dlls/ntdll/loader.c
+@@ -4164,7 +4164,7 @@ static void load_arm64ec_module(void)
+     ULONG buffer[16];
+     KEY_VALUE_PARTIAL_INFORMATION *info = (KEY_VALUE_PARTIAL_INFORMATION *)buffer;
+     UNICODE_STRING nameW = RTL_CONSTANT_STRING( L"\\Registry\\Machine\\Software\\Microsoft\\Wow64\\amd64" );
+-    WCHAR module[64] = L"C:\\windows\\system32\\xtajit64.dll";
++    WCHAR module[64] = L"C:\\windows\\system32\\libarm64ecfex.dll";
+     OBJECT_ATTRIBUTES attr;
+     WINE_MODREF *wm;
+     NTSTATUS status;
+@@ -4248,7 +4248,6 @@ static void init_wow64( CONTEXT *context )
+     pWow64LdrpInitialize( context );
+ }
+ 
+-
+ #else
+ 
+ void *Wow64Transition = NULL;
+diff --git a/dlls/wow64/syscall.c b/dlls/wow64/syscall.c
+index fbc687cc02a..a71945411c4 100644
+--- a/dlls/wow64/syscall.c
++++ b/dlls/wow64/syscall.c
+@@ -745,7 +745,7 @@ static const WCHAR *get_cpu_dll_name(void)
+     {
+     case IMAGE_FILE_MACHINE_I386:
+         RtlInitUnicodeString( &nameW, L"\\Registry\\Machine\\Software\\Microsoft\\Wow64\\x86" );
+-        ret = (native_machine == IMAGE_FILE_MACHINE_ARM64 ? L"xtajit.dll" : L"wow64cpu.dll");
++        ret = (native_machine == IMAGE_FILE_MACHINE_ARM64 ? L"libwow64fex.dll" : L"wow64cpu.dll");
+         break;
+     case IMAGE_FILE_MACHINE_ARMNT:
+         RtlInitUnicodeString( &nameW, L"\\Registry\\Machine\\Software\\Microsoft\\Wow64\\arm" );
+diff --git a/loader/wine.inf.in b/loader/wine.inf.in
+index e3426b7ec95..d1d65327bf1 100644
+--- a/loader/wine.inf.in
++++ b/loader/wine.inf.in
+@@ -431,9 +431,9 @@ HKLM,%CurrentVersion%,"ProgramFilesDir (x86)",,"%16426%"
+ HKLM,%CurrentVersion%,"CommonFilesDir (x86)",,"%16428%"
+ HKLM,%CurrentVersion%,"ProgramFilesDir (Arm)",,"C:\Program Files (Arm)"
+ HKLM,%CurrentVersion%,"CommonFilesDir (Arm)",,"C:\Program Files (Arm)\Common Files"
+-HKLM,Software\Microsoft\Wow64\amd64,,2,"xtajit64.dll"
++HKLM,Software\Microsoft\Wow64\amd64,,2,"libarm64ecfex.dll"
+ HKLM,Software\Microsoft\Wow64\arm,,2,"wowarmhw.dll"
+-HKLM,Software\Microsoft\Wow64\x86,,2,"xtajit.dll"
++HKLM,Software\Microsoft\Wow64\x86,,2,"libwow64fex.dll"
+ 
+ [CurrentVersionWow64.ntx86]
+ HKLM,%CurrentVersion%,"ProgramFilesDir (x86)",,"%16422%"
+-- 
+2.48.1
+
