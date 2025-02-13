@@ -121,7 +121,7 @@ termux_step_pre_configure() {
 	CXXFLAGS="${CXXFLAGS/-fstack-protector-strong/}"
 	LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
 
-	LDFLAGS+=" -landroid-spawn, -landroid-shmem"
+	LDFLAGS+=" -landroid-spawn -landroid-shmem"
 }
 termux_step_make() {
 	make -j $TERMUX_PKG_MAKE_PROCESSES
