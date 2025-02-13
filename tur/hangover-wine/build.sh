@@ -45,7 +45,7 @@ enable_wineandroid_drv=no
 --with-gettextpo=no
 --without-gphoto
 --with-gnutls
---with-gstreamer
+--without-gstreamer
 --without-inotify
 --with-krb5
 --with-mingw=clang
