@@ -7,11 +7,11 @@ TERMUX_PKG_VERSION=10.0
 TERMUX_PKG_REVISION=2
 _REAL_VERSION="${TERMUX_PKG_VERSION/\~/-}"
 TERMUX_PKG_SRCURL=(
-	https://github.com/AndreRH/wine/archive/refs/tags/hangover-$_REAL_VERSION.tar.gz
+	https://dl.winehq.org/wine/source/10.x/wine-10.1.tar.xz
 	https://github.com/AndreRH/hangover/releases/download/hangover-$_REAL_VERSION/hangover_${_REAL_VERSION}_ubuntu2004_focal_arm64.tar
 )
 TERMUX_PKG_SHA256=(
-	f2b61e494d8c04b2f85eb4979fbdc15de651bed6e895c1c61d54b416f405d0ee
+	63471e37b1a515795ff3368d26a039261660e1377cb427d1b61b3a7b76091663
 	c7cb7db11fad036d849b80a8fd6bf2dbae0d3c6b7eefb1bf77b1b7a284a7c913
 )
 TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libandroid-shmem, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
