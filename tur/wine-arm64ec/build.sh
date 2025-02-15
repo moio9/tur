@@ -1,19 +1,13 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/AndreRH/hangover
-TERMUX_PKG_DESCRIPTION="A compatibility layer for running Windows programs (Hangover fork)"
+TERMUX_PKG_HOMEPAGE=https://gitlab.winehq.org/wine/wine
+TERMUX_PKG_DESCRIPTION="A compatibility layer for running Windows programs (Wine ARM64EC)"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.OLD, COPYING.LIB"
 TERMUX_PKG_MAINTAINER="@termux-user-repository"
-TERMUX_PKG_VERSION=10.0
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=10.1
+TERMUX_PKG_REVISION=0
 _REAL_VERSION="${TERMUX_PKG_VERSION/\~/-}"
-TERMUX_PKG_SRCURL=(
-	https://dl.winehq.org/wine/source/10.x/wine-10.1.tar.xz
-	https://github.com/AndreRH/hangover/releases/download/hangover-$_REAL_VERSION/hangover_${_REAL_VERSION}_ubuntu2004_focal_arm64.tar
-)
-TERMUX_PKG_SHA256=(
-	63471e37b1a515795ff3368d26a039261660e1377cb427d1b61b3a7b76091663
-	c7cb7db11fad036d849b80a8fd6bf2dbae0d3c6b7eefb1bf77b1b7a284a7c913
-)
+TERMUX_PKG_SRCURL=https://dl.winehq.org/wine/source/10.x/wine-10.1.tar.xz
+TERMUX_PKG_SHA256=63471e37b1a515795ff3368d26a039261660e1377cb427d1b61b3a7b76091663
 TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libandroid-shmem, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, libandroid-shmem-static, vulkan-loader-generic"
@@ -28,9 +22,9 @@ TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 enable_wineandroid_drv=no
---prefix=$TERMUX_PREFIX/opt/hangover-wine
---exec-prefix=$TERMUX_PREFIX/opt/hangover-wine
---libdir=$TERMUX_PREFIX/opt/hangover-wine/lib
+--prefix=$TERMUX_PREFIX/opt/wine-arm64ec
+--exec-prefix=$TERMUX_PREFIX/opt/wine-arm64ec
+--libdir=$TERMUX_PREFIX/opt/wine-arm64ec/lib
 --with-wine-tools=$TERMUX_PKG_HOSTBUILD_DIR
 --enable-nls
 --disable-tests
@@ -132,31 +126,9 @@ termux_step_make_install() {
 
 	# Create hangover-wine script
 	mkdir -p $TERMUX_PREFIX/bin
-	cat << EOF > $TERMUX_PREFIX/bin/hangover-wine
+	cat << EOF > $TERMUX_PREFIX/bin/wine-arm64ec
 #!$TERMUX_PREFIX/bin/env sh
-exec $TERMUX_PREFIX/opt/hangover-wine/bin/wine "\$@"
+exec $TERMUX_PREFIX/opt/wine-arm64ec/bin/wine "\$@"
 EOF
-	chmod +x $TERMUX_PREFIX/bin/hangover-wine
-}
-
-termux_step_post_make_install() {
-	# Install FEX-based dlls
-	local _type
-	for _type in wow64fex arm64ecfex; do
-		mkdir -p $_type
-		cd $_type
-		ar -x "$TERMUX_PKG_SRCDIR"/hangover-lib${_type}_${_REAL_VERSION}_arm64.deb
-		tar xf data.tar.xz
-		install -Dm644 usr/lib/wine/aarch64-windows/lib$_type.dll \
-			"$TERMUX_PREFIX"/opt/hangover-wine/lib/wine/aarch64-windows/lib$_type.dll
-		install -Dm644 usr/share/doc/hangover-lib$_type/copyright \
-			"$TERMUX_PREFIX"/share/doc/hangover-lib$_type/copyright
-		cd -
-	done
-
-	# Install LICENSE file for hangover
-	mkdir -p "$TERMUX_PREFIX"/share/doc/hangover
-	rm -f "$TERMUX_PREFIX"/share/doc/hangover/copyright
-	curl -L https://raw.githubusercontent.com/AndreRH/hangover/refs/tags/hangover-${_REAL_VERSION}/LICENSE \
-		-o "$TERMUX_PREFIX"/share/doc/hangover/copyright
+	chmod +x $TERMUX_PREFIX/bin/wine-arm64ec
 }
