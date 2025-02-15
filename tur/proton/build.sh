@@ -67,7 +67,7 @@ enable_wineandroid_drv=no
 --with-xrandr
 --with-xrender
 --without-xshape
---without-xshm
+--with-xshm
 --without-xxf86vm
 --enable-archs=i386,aarch64,arm64ec
 "
