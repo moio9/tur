@@ -1,0 +1,64 @@
+From 07feab5d109f6867862b3617d7badf562ea766f0 Mon Sep 17 00:00:00 2001
+From: Billy Laws <blaws05@gmail.com>
+Date: Thu, 5 Sep 2024 15:08:30 +0000
+Subject: [PATCH 13/14] ntdll: Avoid calling syscall callbacks when
+ InSimulation is set.
+
+---
+ dlls/ntdll/signal_arm64ec.c | 5 +++--
+ dlls/ntdll/tests/wow64.c    | 9 +++++++--
+ 2 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/dlls/ntdll/signal_arm64ec.c b/dlls/ntdll/signal_arm64ec.c
+index c702c619b43..b48844ed275 100644
+--- a/dlls/ntdll/signal_arm64ec.c
++++ b/dlls/ntdll/signal_arm64ec.c
+@@ -82,8 +82,9 @@ static inline BOOL is_valid_arm64ec_frame( ULONG_PTR frame )
+ 
+ static inline BOOL enter_syscall_callback(void)
+ {
+-    if (get_arm64ec_cpu_area()->InSyscallCallback) return FALSE;
+-    get_arm64ec_cpu_area()->InSyscallCallback = 1;
++    CHPE_V2_CPU_AREA_INFO *cpu_area = get_arm64ec_cpu_area();
++    if (cpu_area->InSyscallCallback || cpu_area->InSimulation) return FALSE;
++    cpu_area->InSyscallCallback = 1;
+     return TRUE;
+ }
+ 
+diff --git a/dlls/ntdll/tests/wow64.c b/dlls/ntdll/tests/wow64.c
+index 04b6db728de..8ef8f4ad31a 100644
+--- a/dlls/ntdll/tests/wow64.c
++++ b/dlls/ntdll/tests/wow64.c
+@@ -1505,7 +1505,7 @@ static void expect_notifications_( ULONG64 *results, UINT count, const struct ex
+     if (syscall)
+     {
+         CHPE_V2_CPU_AREA_INFO *cpu_area = NtCurrentTeb()->ChpeV2CpuAreaInfo;
+-        if (cpu_area && cpu_area->InSyscallCallback) count = 0;
++        if (cpu_area && (cpu_area->InSyscallCallback || cpu_area->InSimulation)) count = 0;
+     }
+ #endif
+ 
+@@ -1781,7 +1781,8 @@ static void test_notifications( HMODULE module, CROSS_PROCESS_WORK_LIST *list )
+         status = NtMapViewOfSection( mapping, GetCurrentProcess(), &addr, 0, 0, &offset, &size,
+                                      ViewShare, 0, PAGE_READONLY );
+ #ifdef _WIN64
+-        if (NtCurrentTeb()->ChpeV2CpuAreaInfo->InSyscallCallback)
++        if (NtCurrentTeb()->ChpeV2CpuAreaInfo->InSyscallCallback ||
++            NtCurrentTeb()->ChpeV2CpuAreaInfo->InSimulation)
+         {
+             ok( status == STATUS_SUCCESS, "NtMapViewOfSection failed %lx\n", status );
+             expect_notifications( results, 0, NULL, TRUE );
+@@ -2219,6 +2220,10 @@ static void test_memory_notifications(void)
+         NtCurrentTeb()->ChpeV2CpuAreaInfo->InSyscallCallback++;
+         test_notifications( module, (CROSS_PROCESS_WORK_LIST *)info->CrossProcessWorkList );
+         NtCurrentTeb()->ChpeV2CpuAreaInfo->InSyscallCallback--;
++
++        NtCurrentTeb()->ChpeV2CpuAreaInfo->InSimulation++;
++        test_notifications( module, (CROSS_PROCESS_WORK_LIST *)info->CrossProcessWorkList );
++        NtCurrentTeb()->ChpeV2CpuAreaInfo->InSimulation--;
+     }
+     skip( "arm64ec shared info not found\n" );
+ }
+-- 
+2.48.1
+

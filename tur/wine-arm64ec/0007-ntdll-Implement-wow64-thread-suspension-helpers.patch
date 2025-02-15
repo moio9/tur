@@ -1,0 +1,135 @@
+From 24780f7719e9446a5efb5980d49c1330b1819705 Mon Sep 17 00:00:00 2001
+From: Billy Laws <blaws05@gmail.com>
+Date: Thu, 27 Jul 2023 08:00:43 -0700
+Subject: [PATCH] ntdll: Implement WOW64 thread suspension helpers.
+
+---
+ dlls/ntdll/loader.c         |  2 ++
+ dlls/ntdll/ntdll.spec       |  1 +
+ dlls/ntdll/ntdll_misc.h     |  1 +
+ dlls/ntdll/signal_arm64.c   | 17 +++++++++++++++++
+ dlls/ntdll/signal_arm64ec.c |  7 +++++++
+ dlls/ntdll/signal_x86_64.c  |  7 +++++++
+ include/winternl.h          |  1 +
+ 7 files changed, 36 insertions(+)
+
+diff --git a/dlls/ntdll/loader.c b/dlls/ntdll/loader.c
+index 0c25fe141338..54df9f485c94 100644
+--- a/dlls/ntdll/loader.c
++++ b/dlls/ntdll/loader.c
+@@ -4214,6 +4214,7 @@ static void build_wow64_main_module(void)
+ static void (WINAPI *pWow64LdrpInitialize)( CONTEXT *ctx );
+ 
+ void (WINAPI *pWow64PrepareForException)( EXCEPTION_RECORD *rec, CONTEXT *context ) = NULL;
++NTSTATUS (WINAPI *pWow64SuspendLocalThread)( HANDLE thread, ULONG *count ) = NULL;
+ 
+ static void init_wow64( CONTEXT *context )
+ {
+@@ -4238,6 +4239,7 @@ static void init_wow64( CONTEXT *context )
+ 
+         GET_PTR( Wow64LdrpInitialize );
+         GET_PTR( Wow64PrepareForException );
++        GET_PTR( Wow64SuspendLocalThread );
+ #undef GET_PTR
+         imports_fixup_done = TRUE;
+     }
+diff --git a/dlls/ntdll/ntdll.spec b/dlls/ntdll/ntdll.spec
+index 620d96a59926..a4c0cda3d36c 100644
+--- a/dlls/ntdll/ntdll.spec
++++ b/dlls/ntdll/ntdll.spec
+@@ -1136,6 +1136,7 @@
+ @ stdcall -arch=win64 RtlWow64PushCrossProcessWorkOntoWorkList(ptr ptr ptr)
+ @ stdcall -arch=win64 RtlWow64RequestCrossProcessHeavyFlush(ptr)
+ @ stdcall -arch=win64 RtlWow64SetThreadContext(long ptr)
++@ stdcall -arch=win64 RtlWow64SuspendThread(long ptr)
+ @ stub RtlWriteMemoryStream
+ @ stdcall RtlWriteRegistryValue(long ptr wstr long ptr long)
+ @ stub RtlZeroHeap
+diff --git a/dlls/ntdll/ntdll_misc.h b/dlls/ntdll/ntdll_misc.h
+index fb5fb311646c..08ea09c53abe 100644
+--- a/dlls/ntdll/ntdll_misc.h
++++ b/dlls/ntdll/ntdll_misc.h
+@@ -78,6 +78,7 @@ extern void WINAPI KiUserApcDispatcher(CONTEXT*,ULONG_PTR,ULONG_PTR,ULONG_PTR,PN
+ extern void WINAPI KiUserCallbackDispatcher(ULONG,void*,ULONG);
+ extern void WINAPI KiUserCallbackDispatcherReturn(void);
+ extern void (WINAPI *pWow64PrepareForException)( EXCEPTION_RECORD *rec, CONTEXT *context );
++extern NTSTATUS (WINAPI *pWow64SuspendLocalThread)( HANDLE thread, ULONG *count );
+ 
+ /* debug helpers */
+ extern LPCSTR debugstr_us( const UNICODE_STRING *str );
+diff --git a/dlls/ntdll/signal_arm64.c b/dlls/ntdll/signal_arm64.c
+index c8eafc36211f..0b6a414aabec 100644
+--- a/dlls/ntdll/signal_arm64.c
++++ b/dlls/ntdll/signal_arm64.c
+@@ -643,6 +643,23 @@ BOOLEAN WINAPI RtlIsProcessorFeaturePresent( UINT feature )
+             user_shared_data->ProcessorFeatures[feature]);
+ }
+ 
++/***********************************************************************
++ *              RtlWow64SuspendThread (NTDLL.@)
++ */
++NTSTATUS WINAPI RtlWow64SuspendThread( HANDLE thread, ULONG *count )
++{
++    THREAD_BASIC_INFORMATION tbi;
++
++    NTSTATUS ret = NtQueryInformationThread( thread, ThreadBasicInformation, &tbi, sizeof(tbi), NULL);
++    if (ret) return ret;
++
++    if (tbi.ClientId.UniqueProcess != NtCurrentTeb()->ClientId.UniqueProcess) {
++        FIXME( "Non-local process thread suspend\n" );
++        return STATUS_SUCCESS;
++    }
++
++    return pWow64SuspendLocalThread( thread, count );
++}
+ 
+ /*************************************************************************
+  *		RtlWalkFrameChain (NTDLL.@)
+diff --git a/dlls/ntdll/signal_arm64ec.c b/dlls/ntdll/signal_arm64ec.c
+index 4505aeacfbae..607e1f53c95e 100644
+--- a/dlls/ntdll/signal_arm64ec.c
++++ b/dlls/ntdll/signal_arm64ec.c
+@@ -1766,6 +1766,13 @@ BOOLEAN WINAPI RtlIsProcessorFeaturePresent( UINT feature )
+     return emulated_processor_features[feature];
+ }
+ 
++/***********************************************************************
++ *              RtlWow64SuspendThread (NTDLL.@)
++ */
++NTSTATUS WINAPI RtlWow64SuspendThread( HANDLE thread, ULONG *count )
++{
++    return NtSuspendThread( thread, count );
++}
+ 
+ /*************************************************************************
+  *		RtlWalkFrameChain (NTDLL.@)
+diff --git a/dlls/ntdll/signal_x86_64.c b/dlls/ntdll/signal_x86_64.c
+index 7320aeabd49a..24e513de0ef2 100644
+--- a/dlls/ntdll/signal_x86_64.c
++++ b/dlls/ntdll/signal_x86_64.c
+@@ -846,6 +846,13 @@ BOOLEAN WINAPI RtlIsProcessorFeaturePresent( UINT feature )
+     return feature < PROCESSOR_FEATURE_MAX && user_shared_data->ProcessorFeatures[feature];
+ }
+ 
++/***********************************************************************
++ *              RtlWow64SuspendThread (NTDLL.@)
++ */
++NTSTATUS WINAPI RtlWow64SuspendThread( HANDLE thread, ULONG *count )
++{
++    return NtSuspendThread( thread, count );
++}
+ 
+ /*************************************************************************
+  *		RtlWalkFrameChain (NTDLL.@)
+diff --git a/include/winternl.h b/include/winternl.h
+index 0bae9fbf3859..700a91874f47 100644
+--- a/include/winternl.h
++++ b/include/winternl.h
+@@ -5145,6 +5145,7 @@ NTSYSAPI USHORT    WINAPI RtlWow64GetCurrentMachine(void);
+ NTSYSAPI NTSTATUS  WINAPI RtlWow64GetProcessMachines(HANDLE,USHORT*,USHORT*);
+ NTSYSAPI NTSTATUS  WINAPI RtlWow64GetSharedInfoProcess(HANDLE,BOOLEAN*,WOW64INFO*);
+ NTSYSAPI NTSTATUS  WINAPI RtlWow64IsWowGuestMachineSupported(USHORT,BOOLEAN*);
++NTSYSAPI NTSTATUS  WINAPI RtlWow64SuspendThread(HANDLE,ULONG*);
+ NTSYSAPI NTSTATUS  WINAPI RtlWriteRegistryValue(ULONG,PCWSTR,PCWSTR,ULONG,PVOID,ULONG);
+ NTSYSAPI NTSTATUS  WINAPI RtlZombifyActivationContext(HANDLE);
+ NTSYSAPI NTSTATUS  WINAPI RtlpNtCreateKey(PHANDLE,ACCESS_MASK,const OBJECT_ATTRIBUTES*,ULONG,const UNICODE_STRING*,ULONG,PULONG);
