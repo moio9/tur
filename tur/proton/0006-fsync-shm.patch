@@ -20,7 +20,7 @@ index c3da44e..abf224c 100644
  
  NTSTATUS fsync_create_semaphore( HANDLE *handle, ACCESS_MASK access,
 diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
-index 9236974..9d01254 100644
+index 9236974..2f6f849 100644
 --- a/dlls/ntdll/unix/virtual.c
 +++ b/dlls/ntdll/unix/virtual.c
 @@ -6271,8 +6271,9 @@ NTSTATUS get_memory_fex_stats_shm( HANDLE process, LPCVOID addr, MEMORY_FEX_STAT
@@ -28,7 +28,7 @@ index 9236974..9d01254 100644
          oflag |= O_CREAT | O_TRUNC;
      }
 -
-+#if defined linux && !defined ANDROID
++#if defined __linux__ && !defined __ANDROID__
      fd = shm_open( buf, oflag, S_IRWXU | S_IRWXG | S_IRWXO );
 +#endif
      if (fd == -1) return STATUS_INTERNAL_ERROR;
