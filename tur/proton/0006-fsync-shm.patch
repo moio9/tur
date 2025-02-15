@@ -1,45 +1,50 @@
 diff --git a/dlls/ntdll/unix/fsync.c b/dlls/ntdll/unix/fsync.c
-index c3da44e..b5fc6b9 100644
+index c3da44e..abf224c 100644
 --- a/dlls/ntdll/unix/fsync.c
 +++ b/dlls/ntdll/unix/fsync.c
-@@ -546,6 +546,7 @@ static NTSTATUS open_fsync( enum fsync_type type, HANDLE *handle,
-     return ret;
- }
- 
-+#if defined __linux__ && !defined __ANDROID__
- void fsync_init(void)
- {
-     struct stat st;
-@@ -583,6 +584,7 @@ void fsync_init(void)
-             ERR("Failed to initialize shared memory: %s\n", strerror( errno ));
-         exit(1);
-     }
-+#endif
+@@ -573,7 +573,7 @@ void fsync_init(void)
+         sprintf( shm_name, "/wine-%lx%08lx-fsync", (unsigned long)((unsigned long long)st.st_ino >> 32), (unsigned long)st.st_ino );
+     else
+         sprintf( shm_name, "/wine-%lx-fsync", (unsigned long)st.st_ino );
+-
++    #if defined __linux__ && !defined __ANDROID__
+     if ((shm_fd = shm_open( shm_name, O_RDWR, 0644 )) == -1)
+     {
+         /* probably the server isn't running with WINEFSYNC, tell the user and bail */
+@@ -586,6 +586,7 @@ void fsync_init(void)
  
      current_pid = GetCurrentProcessId();
      assert(current_pid);
++    #endif
+ }
+ 
+ NTSTATUS fsync_create_semaphore( HANDLE *handle, ACCESS_MASK access,
 diff --git a/server/fsync.c b/server/fsync.c
-index dc50aa0..550c3a5 100644
+index dc50aa0..c92b11a 100644
 --- a/server/fsync.c
 +++ b/server/fsync.c
-@@ -82,13 +82,16 @@ static uint32_t shm_idx_free_search_start_hint;
- 
- #define BITS_IN_FREE_MAP_WORD (8 * sizeof(*shm_idx_free_map))
- 
-+#if defined __linux__ && !defined __ANDROID__
+@@ -85,8 +85,10 @@ static uint32_t shm_idx_free_search_start_hint;
  static void shm_cleanup(void)
  {
      close( shm_fd );
++#if defined __linux__ && !defined __ANDROID__
      if (shm_unlink( shm_name ) == -1)
          perror( "shm_unlink" );
- }
 +#endif
+ }
+ 
+ void fsync_init(void)
+@@ -104,7 +106,9 @@ void fsync_init(void)
+     if (!shm_unlink( shm_name ))
+         fprintf( stderr, "fsync: warning: a previous shm file %s was not properly removed\n", shm_name );
  
 +#if defined __linux__ && !defined __ANDROID__
- void fsync_init(void)
- {
-     struct stat st;
-@@ -126,6 +129,7 @@ void fsync_init(void)
+     shm_fd = shm_open( shm_name, O_RDWR | O_CREAT | O_EXCL, 0644 );
++#endif
+     if (shm_fd == -1)
+         perror( "shm_open" );
+ 
+@@ -126,6 +130,7 @@ void fsync_init(void)
  
      atexit( shm_cleanup );
  }
