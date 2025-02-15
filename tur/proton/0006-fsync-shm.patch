@@ -20,7 +20,7 @@ index c3da44e..abf224c 100644
  
  NTSTATUS fsync_create_semaphore( HANDLE *handle, ACCESS_MASK access,
 diff --git a/server/fsync.c b/server/fsync.c
-index dc50aa0..4c90e0f 100644
+index dc50aa0..7a0342e 100644
 --- a/server/fsync.c
 +++ b/server/fsync.c
 @@ -85,8 +85,10 @@ static uint32_t shm_idx_free_search_start_hint;
@@ -34,10 +34,16 @@ index dc50aa0..4c90e0f 100644
  }
  
  void fsync_init(void)
-@@ -104,7 +106,9 @@ void fsync_init(void)
+@@ -100,11 +102,13 @@ void fsync_init(void)
+         sprintf( shm_name, "/wine-%lx%08lx-fsync", (unsigned long)((unsigned long long)st.st_ino >> 32), (unsigned long)st.st_ino );
+     else
+         sprintf( shm_name, "/wine-%lx-fsync", (unsigned long)st.st_ino );
+-
++#if defined __linux__ && !defined __ANDROID__
      if (!shm_unlink( shm_name ))
          fprintf( stderr, "fsync: warning: a previous shm file %s was not properly removed\n", shm_name );
- 
+-
++#endif
 +#if defined __linux__ && !defined __ANDROID__
      shm_fd = shm_open( shm_name, O_RDWR | O_CREAT | O_EXCL, 0644 );
 +#endif
