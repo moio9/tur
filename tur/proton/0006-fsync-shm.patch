@@ -20,7 +20,7 @@ index c3da44e..abf224c 100644
  
  NTSTATUS fsync_create_semaphore( HANDLE *handle, ACCESS_MASK access,
 diff --git a/server/fsync.c b/server/fsync.c
-index dc50aa0..c92b11a 100644
+index dc50aa0..4c90e0f 100644
 --- a/server/fsync.c
 +++ b/server/fsync.c
 @@ -85,8 +85,10 @@ static uint32_t shm_idx_free_search_start_hint;
@@ -43,12 +43,4 @@ index dc50aa0..c92b11a 100644
 +#endif
      if (shm_fd == -1)
          perror( "shm_open" );
- 
-@@ -126,6 +130,7 @@ void fsync_init(void)
- 
-     atexit( shm_cleanup );
- }
-+#endif
- 
- static struct list mutex_list = LIST_INIT(mutex_list);
  
