@@ -31,14 +31,14 @@ index c3da44e..2f57035 100644
      if ((shm_fd = shm_open( shm_name, O_RDWR, 0644 )) == -1)
      {
 diff --git a/dlls/ntdll/unix/loader.c b/dlls/ntdll/unix/loader.c
-index e4f110d..2aea16c 100644
+index e4f110d..3a0abe7 100644
 --- a/dlls/ntdll/unix/loader.c
 +++ b/dlls/ntdll/unix/loader.c
 @@ -2255,7 +2255,9 @@ static void start_main_thread(void)
      dbg_init();
      startup_info_size = server_init_process();
      hacks_init();
-+#if defined linux && !defined ANDROID
++#if defined(__linux__) && !defined(__ANDROID__)
      fsync_init();
 +#endif
      esync_init();
