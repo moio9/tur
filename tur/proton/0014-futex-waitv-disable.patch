@@ -1,26 +1,81 @@
 diff --git a/dlls/ntdll/unix/fsync.c b/dlls/ntdll/unix/fsync.c
-index c3da44e4..0a73fcce 100644
+index c3da44e..2f57035 100644
 --- a/dlls/ntdll/unix/fsync.c
 +++ b/dlls/ntdll/unix/fsync.c
-@@ -165,7 +165,7 @@ static inline int futex_wake( int *addr, int val )
-
+@@ -165,12 +165,14 @@ static inline int futex_wake( int *addr, int val )
+ 
  int do_fsync(void)
  {
 -#ifdef __linux__
-+#ifdef __linux__ && !defined __ANDROID__
++#if defined(__linux__) && !defined(__ANDROID__)
      static int do_fsync_cached = -1;
-
+ 
      if (do_fsync_cached == -1)
+     {
++        #if defined(__linux__) && !defined(__ANDROID__)
+         syscall( __NR_futex_waitv, NULL, 0, 0, NULL, 0 );
++        #endif
+         do_fsync_cached = getenv("WINEFSYNC") && atoi(getenv("WINEFSYNC")) && errno != ENOSYS;
+     }
+ 
+@@ -570,9 +572,9 @@ void fsync_init(void)
+         ERR("Cannot stat %s\n", config_dir);
+ 
+     if (st.st_ino != (unsigned long)st.st_ino)
+-        sprintf( shm_name, "/wine-%lx%08lx-fsync", (unsigned long)((unsigned long long)st.st_ino >> 32), (unsigned long)st.st_ino );
++        sprintf( shm_name, "/data/data/com.termux/files/usr/tmp/wine-%lx%08lx-fsync", (unsigned long)((unsigned long long)st.st_ino >> 32), (unsigned long)st.st_ino );
+     else
+-        sprintf( shm_name, "/wine-%lx-fsync", (unsigned long)st.st_ino );
++        sprintf( shm_name, "/data/data/com.termux/files/usr/tmp/wine-%lx-fsync", (unsigned long)st.st_ino );
+ 
+     if ((shm_fd = shm_open( shm_name, O_RDWR, 0644 )) == -1)
+     {
+diff --git a/dlls/ntdll/unix/loader.c b/dlls/ntdll/unix/loader.c
+index e4f110d..2aea16c 100644
+--- a/dlls/ntdll/unix/loader.c
++++ b/dlls/ntdll/unix/loader.c
+@@ -2255,7 +2255,9 @@ static void start_main_thread(void)
+     dbg_init();
+     startup_info_size = server_init_process();
+     hacks_init();
++#if defined linux && !defined ANDROID
+     fsync_init();
++#endif
+     esync_init();
+     virtual_map_user_shared_data();
+     init_cpu_info();
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 9236974..fbb4acb 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -408,8 +408,9 @@ static void kernel_writewatch_softdirty_init(void)
+ static void kernel_writewatch_init(void)
+ {
+     struct uffdio_api uffdio_api;
+-
++#if defined __linux__ && !defined __ANDROID__
+     uffd_fd = syscall( __NR_userfaultfd, O_CLOEXEC | O_NONBLOCK | UFFD_USER_MODE_ONLY );
++#endif
+     if (uffd_fd == -1)
+     {
+         kernel_writewatch_softdirty_init();
 diff --git a/server/fsync.c b/server/fsync.c
-index dc50aa0a..deae5f27 100644
+index dc50aa0..b83e2a5 100644
 --- a/server/fsync.c
 +++ b/server/fsync.c
-@@ -53,7 +53,7 @@
-
+@@ -53,12 +53,14 @@
+ 
  int do_fsync(void)
  {
 -#ifdef __linux__
-+#ifdef __linux__ && !defined __ANDROID__
++#if defined(__linux__) && !defined(__ANDROID__)
      static int do_fsync_cached = -1;
-
+ 
      if (do_fsync_cached == -1)
+     {
++        #if defined(__linux__) && !defined(__ANDROID__)
+         syscall( __NR_futex_waitv, 0, 0, 0, 0, 0);
++        #endif
+         do_fsync_cached = getenv("WINEFSYNC") && atoi(getenv("WINEFSYNC")) && errno != ENOSYS;
+     }
+ 
