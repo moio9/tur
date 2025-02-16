@@ -60,7 +60,7 @@ index 9236974..fbb4acb 100644
      {
          kernel_writewatch_softdirty_init();
 diff --git a/server/fsync.c b/server/fsync.c
-index dc50aa0..d33ed2d 100644
+index dc50aa0..e6abc28 100644
 --- a/server/fsync.c
 +++ b/server/fsync.c
 @@ -53,12 +53,14 @@
@@ -90,7 +90,7 @@ index dc50aa0..d33ed2d 100644
  }
  
  void fsync_init(void)
-@@ -97,14 +101,15 @@ void fsync_init(void)
+@@ -97,14 +101,16 @@ void fsync_init(void)
          fatal_error( "cannot stat config dir\n" );
  
      if (st.st_ino != (unsigned long)st.st_ino)
@@ -98,11 +98,13 @@ index dc50aa0..d33ed2d 100644
 +        sprintf( shm_name, "/data/data/com.termux/files/usr/tmp/wine-%lx%08lx-fsync", (unsigned long)((unsigned long long)st.st_ino >> 32), (unsigned long)st.st_ino );
      else
 -        sprintf( shm_name, "/wine-%lx-fsync", (unsigned long)st.st_ino );
+-
 +        sprintf( shm_name, "/data/data/com.termux/files/usr/tmp/wine-%lx-fsync", (unsigned long)st.st_ino );
- 
++#if defined(__linux__) && !defined(__ANDROID__)
      if (!shm_unlink( shm_name ))
          fprintf( stderr, "fsync: warning: a previous shm file %s was not properly removed\n", shm_name );
 -
++#endif
 +#if defined(__linux__) && !defined(__ANDROID__)
      shm_fd = shm_open( shm_name, O_RDWR | O_CREAT | O_EXCL, 0644 );
 +#endif
