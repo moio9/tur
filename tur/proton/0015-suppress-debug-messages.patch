@@ -1,16 +1,16 @@
 diff --git a/dlls/ntdll/unix/fsync.c b/dlls/ntdll/unix/fsync.c
-index c3da44e..4361b6f 100644
+index c3da44e..67f98fb 100644
 --- a/dlls/ntdll/unix/fsync.c
 +++ b/dlls/ntdll/unix/fsync.c
-@@ -165,7 +165,7 @@ static inline int futex_wake( int *addr, int val )
- 
- int do_fsync(void)
- {
--#ifdef __linux__
-+#if defined(__linux__) && !defined(__ANDROID__)
-     static int do_fsync_cached = -1;
- 
-     if (do_fsync_cached == -1)
+@@ -177,8 +177,6 @@ int do_fsync(void)
+     return do_fsync_cached;
+ #else
+     static int once;
+-    if (!once++)
+-        FIXME("futexes not supported on this platform.\n");
+     return 0;
+ #endif
+ }
 diff --git a/loader/preloader.c b/loader/preloader.c
 index f27d6df..c3b6f29 100644
 --- a/loader/preloader.c
