@@ -119,9 +119,9 @@ termux_step_pre_configure() {
 
 	# Disable hardening
 	CPPFLAGS="${CPPFLAGS/-fstack-protector-strong/}"
-        CFLAGS="${CFLAGS/-fstack-protector-strong/} -static-libstdc++"
-        CXXFLAGS="${CXXFLAGS/-fstack-protector-strong/} -static-libstdc++"
-
+ 	CFLAGS="${CFLAGS/-fstack-protector-strong/} -static-libstdc++"
+  	CXXFLAGS="${CXXFLAGS/-fstack-protector-strong/} -static-libstdc++"
+   
 	LDFLAGS+=" -landroid-spawn -static-libstdc++"
 
 	if [ "$TERMUX_ARCH" = "x86_64" ]; then
