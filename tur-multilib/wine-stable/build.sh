@@ -23,6 +23,7 @@ enable_wineandroid_drv=no
 --exec-prefix=$TERMUX_PREFIX/opt/wine-stable
 --libdir=$TERMUX_PREFIX/opt/wine-stable/lib
 --with-wine-tools=$TERMUX_PKG_HOSTBUILD_DIR
+--static-libstdc++
 --enable-nls
 --disable-tests
 --without-alsa
