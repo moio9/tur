@@ -23,7 +23,6 @@ enable_wineandroid_drv=no
 --exec-prefix=$TERMUX_PREFIX/opt/wine-stable
 --libdir=$TERMUX_PREFIX/opt/wine-stable/lib
 --with-wine-tools=$TERMUX_PKG_HOSTBUILD_DIR
---static-libstdc++
 --enable-nls
 --disable-tests
 --without-alsa
@@ -120,11 +119,10 @@ termux_step_pre_configure() {
 
 	# Disable hardening
 	CPPFLAGS="${CPPFLAGS/-fstack-protector-strong/}"
-	CFLAGS="${CFLAGS/-fstack-protector-strong/}"
-	CXXFLAGS="${CXXFLAGS/-fstack-protector-strong/}"
-	LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
+        CFLAGS="${CFLAGS/-fstack-protector-strong/} -static-libstdc++"
+        CXXFLAGS="${CXXFLAGS/-fstack-protector-strong/} -static-libstdc++"
 
-	LDFLAGS+=" -landroid-spawn"
+	LDFLAGS+=" -landroid-spawn -static-libstdc++"
 
 	if [ "$TERMUX_ARCH" = "x86_64" ]; then
 		mkdir -p "$TERMUX_PKG_TMPDIR/bin"
