@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A compatibility layer for running Windows programs"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.OLD, COPYING.LIB"
 TERMUX_PKG_MAINTAINER="@termux-user-repository"
-TERMUX_PKG_VERSION="10.0"
+TERMUX_PKG_VERSION="10.3"
 TERMUX_PKG_REVISION=1
 _REAL_VERSION="${TERMUX_PKG_VERSION/\~/-}"
 _VERSION_FOLDER="$(test "${_REAL_VERSION:3:1}" = 0 && echo ${_REAL_VERSION:0:4} || echo ${_REAL_VERSION:0:3}x)"
@@ -15,9 +15,9 @@ TERMUX_PKG_SHA256=(
 	c5e0b3f5f7efafb30e9cd4d9c624b85c583171d33549d933cd3402f341ac3601
 	59eb36a2d9786d28242901458b282d49430bdbacf801af575566dcfc6c2943ea
 )
-TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
+TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libandroid-shmem, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
-TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, vulkan-loader-generic"
+TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, libandroid-shmem-static, vulkan-loader-generic"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
@@ -74,7 +74,7 @@ enable_wineandroid_drv=no
 --with-xrandr
 --with-xrender
 --without-xshape
---without-xshm
+--with-xshm
 --without-xxf86vm
 "
 
@@ -161,7 +161,7 @@ termux_step_pre_configure() {
 	CXXFLAGS="${CXXFLAGS/-fstack-protector-strong/}"
 	LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
 
-	LDFLAGS+=" -landroid-spawn"
+	LDFLAGS+=" -landroid-spawn -landroid-shmem"
 
 	if [ "$TERMUX_ARCH" = "x86_64" ]; then
 		mkdir -p "$TERMUX_PKG_TMPDIR/bin"
