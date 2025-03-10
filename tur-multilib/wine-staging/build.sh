@@ -12,8 +12,8 @@ TERMUX_PKG_SRCURL=(
 	https://github.com/wine-staging/wine-staging/archive/v$_REAL_VERSION.tar.gz
 )
 TERMUX_PKG_SHA256=(
-	c5e0b3f5f7efafb30e9cd4d9c624b85c583171d33549d933cd3402f341ac3601
-	59eb36a2d9786d28242901458b282d49430bdbacf801af575566dcfc6c2943ea
+	de3d88ff0056b82ffdfca842f1119592e4914f48c4ea023768e0419c36467c3e
+	775fc4e8cef23700e4ec8e14923d6cf737136ef5be3071fcda7dd55168d4b9e9
 )
 TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libandroid-shmem, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
