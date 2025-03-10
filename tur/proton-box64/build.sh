@@ -22,8 +22,8 @@ TERMUX_PKG_BLACKLISTED_ARCHES="arm, aarch64, i686"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 enable_wineandroid_drv=no
---prefix=$TERMUX_PREFIX/opt/proton-wine
---exec-prefix=$TERMUX_PREFIX/opt/proton-wine
+--prefix=$TERMUX_PREFIX/opt/proton-box64
+--exec-prefix=$TERMUX_PREFIX/opt/proton-box64
 --libdir=$TERMUX_PREFIX/opt/proton-wine/lib
 --with-wine-tools=$TERMUX_PKG_HOSTBUILD_DIR
 --enable-nls
@@ -67,7 +67,7 @@ enable_wineandroid_drv=no
 --with-xrandr
 --with-xrender
 --without-xshape
---with-xshm
+--without-xshm
 --without-xxf86vm
 --enable-archs=i386,x86_64
 "
@@ -121,7 +121,7 @@ termux_step_pre_configure() {
 	CXXFLAGS+=" -Wno-implicit-function-declaration"
 
 	# Link android-spawn
-	LDFLAGS+=" -landroid-spawn -landroid-shmem -static-libstdc++"
+	LDFLAGS+=" -landroid-spawn"
 }
 
 termux_step_make() {
