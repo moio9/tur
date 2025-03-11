@@ -1,0 +1,27 @@
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index bc6b80152ec..e5857d63d7d 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -1942,14 +1942,14 @@ static void install_bpf(struct sigaction *sig_act)
+     struct sock_fprog prog;
+     NTSTATUS status;
+ 
+-    if ((ULONG_PTR)sc_seccomp < NATIVE_SYSCALL_ADDRESS_START
+-            || (ULONG_PTR)syscall < NATIVE_SYSCALL_ADDRESS_START)
+-    {
+-        ERR_(seh)("Native libs are being loaded in low addresses, sc_seccomp %p, syscall %p, not installing seccomp.\n",
+-                sc_seccomp, syscall);
+-        ERR_(seh)("The known reasons are /proc/sys/vm/legacy_va_layout set to 1 or 'ulimit -s' being 'unlimited'.\n");
+-        return;
+-    }
++    //if ((ULONG_PTR)sc_seccomp < NATIVE_SYSCALL_ADDRESS_START
++    //        || (ULONG_PTR)syscall < NATIVE_SYSCALL_ADDRESS_START)
++    //{
++    //    ERR_(seh)("Native libs are being loaded in low addresses, sc_seccomp %p, syscall %p, not installing seccomp.\n",
++    //            sc_seccomp, syscall);
++    //    ERR_(seh)("The known reasons are /proc/sys/vm/legacy_va_layout set to 1 or 'ulimit -s' being 'unlimited'.\n");
++    //    return;
++    //}
+ 
+     sig_act->sa_sigaction = sigsys_handler;
+     memset(&prog, 0, sizeof(prog));
