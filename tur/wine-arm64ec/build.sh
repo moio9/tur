@@ -42,7 +42,7 @@ enable_wineandroid_drv=no
 --without-gstreamer
 --without-inotify
 --with-krb5
---with-mingw=clang
+--with-mingw
 --without-netapi
 --without-opencl
 --with-opengl
@@ -69,7 +69,7 @@ enable_wineandroid_drv=no
 --without-xshape
 --with-xshm
 --without-xxf86vm
---enable-archs=i386,aarch64,arm64ec
+--enable-archs=i386,arm,aarch64,arm64ec
 "
 # TODO: `--enable-archs=arm` doesn't build with option `--with-mingw=clang`, but
 # TODO: `arm64ec` doesn't build with option `--with-mingw` (arm64ec-w64-mingw32-clang)
