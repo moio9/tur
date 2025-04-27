@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION="A compatibility layer for running Windows programs (Wine
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.OLD, COPYING.LIB"
 TERMUX_PKG_MAINTAINER="@termux-user-repository"
-TERMUX_PKG_VERSION=10.1
+TERMUX_PKG_VERSION=10.5
 TERMUX_PKG_REVISION=0
 _REAL_VERSION="${TERMUX_PKG_VERSION/\~/-}"
-TERMUX_PKG_SRCURL=https://dl.winehq.org/wine/source/10.x/wine-10.5.tar.xz
-TERMUX_PKG_SHA256=c036ec1ef47674774a5f994583022e9e2eb68fe8fc18b3a8c79e685b3bec89bc
+TERMUX_PKG_SRCURL=https://github.com/airidosas252/wine-test/releases/download/Proton-9.0-fix/wine-10.5-arm64ec.tar.xz
+TERMUX_PKG_SHA256=a61695c9c11efa79b5729710413217a10a0cb4c3419961795c099e3cfc5e1f56
 TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libandroid-shmem, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, libandroid-shmem-static, vulkan-loader-generic"
@@ -42,7 +42,7 @@ enable_wineandroid_drv=no
 --without-gstreamer
 --without-inotify
 --with-krb5
---with-mingw
+--with-mingw=clang
 --without-netapi
 --without-opencl
 --with-opengl
@@ -69,7 +69,7 @@ enable_wineandroid_drv=no
 --without-xshape
 --with-xshm
 --without-xxf86vm
---enable-archs=i386,arm,aarch64,arm64ec
+--enable-archs=i386,aarch64,arm64ec
 "
 # TODO: `--enable-archs=arm` doesn't build with option `--with-mingw=clang`, but
 # TODO: `arm64ec` doesn't build with option `--with-mingw` (arm64ec-w64-mingw32-clang)
@@ -77,10 +77,10 @@ enable_wineandroid_drv=no
 _setup_llvm_mingw_toolchain() {
 	# LLVM-mingw's version number must not be the same as the NDK's.
 	local _llvm_mingw_version=19
-	local _version="20241218"
-	local _url="https://github.com/bylaws/llvm-mingw/releases/download/20241812/llvm-mingw-20241218-ucrt-ubuntu-20.04-x86_64.tar.xz"
+	local _version="20250305"
+	local _url="https://github.com/bylaws/llvm-mingw/releases/download/20250305/llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz"
 	local _path="$TERMUX_PKG_CACHEDIR/$(basename $_url)"
-	local _sha256sum=710b7a96a06c99128427d31e3b7b1cac5b17a111219ae1c163e1f1f870c434b6
+	local _sha256sum=30950e32b6d3d222488e2b0ec254cd5da15125dab7a2a8c4ebf559f06f3eb256
 	termux_download $_url $_path $_sha256sum
 	local _extract_path="$TERMUX_PKG_CACHEDIR/llvm-mingw-toolchain-$_llvm_mingw_version"
 	if [ ! -d "$_extract_path" ]; then
