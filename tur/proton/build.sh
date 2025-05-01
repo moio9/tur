@@ -14,6 +14,7 @@ TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, vulkan-loader-generic, liband
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
+--without-x
 --disable-tests
 "
 
