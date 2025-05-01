@@ -8,13 +8,12 @@ TERMUX_PKG_REVISION=0
 _REAL_VERSION="${TERMUX_PKG_VERSION/\~/-}"
 TERMUX_PKG_SRCURL=https://github.com/airidosas252/wine-test/releases/download/Proton-9.0-fix/wine-proton-10.0-arm64ec.tar.xz
 TERMUX_PKG_SHA256=dd89d0eec85ca92190e43cfa36b54bb611773bed2ae2aaa470a48acedb007451
-TERMUX_PKG_DEPENDS="fontconfig, gstreamer, gst-plugins-good, gst-plugins-ugly, gst-plugins-bad, gst-plugins-base, libdrm, freetype, krb5, libandroid-spawn, libandroid-shmem, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
+TERMUX_PKG_DEPENDS="fontconfig, gstreamer, gst-plugins-good, gst-plugins-ugly, gst-plugins-bad, gst-plugins-base, libdrm, freetype, krb5, libandroid-spawn, libandroid-shmem, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, libxinerama, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, vulkan-loader-generic, libandroid-shmem-static"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
---without-x
 --disable-tests
 "
 
@@ -61,13 +60,13 @@ enable_wineandroid_drv=no
 --with-xcomposite
 --with-xcursor
 --with-xfixes
---without-xinerama
+--with-xinerama
 --with-xinput
 --with-xinput2
 --with-xrandr
 --with-xrender
 --without-xshape
---with-xshm
+--without-xshm
 --without-xxf86vm
 --enable-archs=i386,aarch64,arm64ec
 "
@@ -121,7 +120,7 @@ termux_step_pre_configure() {
 	CXXFLAGS+=" -Wno-implicit-function-declaration"
 
 	# Link android-spawn
-	LDFLAGS+=" -landroid-spawn -landroid-shmem"
+	LDFLAGS+=" -landroid-spawn"
 }
 
 termux_step_make() {
