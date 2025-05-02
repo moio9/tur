@@ -69,6 +69,7 @@ enable_wineandroid_drv=no
 --without-xshape
 --with-xshm
 --without-xxf86vm
+--without-wayland
 --enable-archs=i386,x86_64
 "
 # TODO: `--enable-archs=arm` doesn't build with option `--with-mingw=clang`, but
