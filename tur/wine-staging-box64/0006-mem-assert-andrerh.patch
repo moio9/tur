@@ -1,0 +1,16 @@
+From b75c6b82aa0f9e96d9b6528b4735fdd348102c9b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Zwing?= <nerv@dawncrow.de>
+Date: Wed, 23 Apr 2025 21:46:13 +0200
+Subject: [PATCH] wine: Add a patch for the virtual heap allocation issue
+
+---
+ wine | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wine b/wine
+index c3e4b15c..34892e68 160000
+--- a/wine
++++ b/wine
+@@ -1 +1 @@
+-Subproject commit c3e4b15c62f2112fb544944602df6d165b81ea17
++Subproject commit 34892e68f9d3c6c4feeee22d738ad4554ee98e65
