@@ -62,7 +62,6 @@ enable_wineandroid_drv=no
 --with-xcursor
 --with-xfixes
 --with-xinerama
---with-xinput
 --with-xinput2
 --with-xrandr
 --with-xrender
